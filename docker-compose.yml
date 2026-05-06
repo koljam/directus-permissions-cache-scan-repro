@@ -1,0 +1,58 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: directus
+      POSTGRES_PASSWORD: directus
+      POSTGRES_DB: directus
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U directus"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--requirepass", "redispw", "--save", "", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "redispw", "ping"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+  directus:
+    image: directus/directus:11.17.3
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "${DIRECTUS_PORT:-8055}:8055"
+    environment:
+      KEY: 255d861b-5ea1-5996-9aae-2b521c00cc01
+      SECRET: 6116487b-cda1-52c2-b5b5-c8022c45e4a4
+
+      DB_CLIENT: pg
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: directus
+      DB_USER: directus
+      DB_PASSWORD: directus
+
+      ADMIN_EMAIL: admin@example.com
+      ADMIN_PASSWORD: admin
+
+      # Cache "off" — what an unsuspecting operator would set:
+      CACHE_ENABLED: false
+      CACHE_STORE: memory
+
+      # Redis configured (e.g. for the messenger or a sibling BullMQ worker).
+      # The bug: this alone forces the permissions cache onto Redis,
+      # ignoring CACHE_STORE=memory.
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: redispw
+
+      LOG_LEVEL: info
+      PUBLIC_URL: http://localhost:${DIRECTUS_PORT:-8055}

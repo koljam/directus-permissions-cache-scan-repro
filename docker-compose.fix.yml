@@ -1,0 +1,6 @@
+# Override that applies the workaround — REDIS_ENABLED=false.
+# Usage:  docker compose -f docker-compose.yml -f docker-compose.fix.yml up -d
+services:
+  directus:
+    environment:
+      REDIS_ENABLED: false

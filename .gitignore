@@ -1,0 +1,4 @@
+.ids
+*.db
+*.log
+.env
