@@ -47,7 +47,7 @@ services:
       CACHE_ENABLED: false
       CACHE_STORE: memory
 
-      # Redis configured (e.g. for the messenger or a sibling BullMQ worker).
+      # Redis configured (e.g. for an extention adding jobs to an external queue).
       # The bug: this alone forces the permissions cache onto Redis,
       # ignoring CACHE_STORE=memory.
       REDIS_HOST: redis

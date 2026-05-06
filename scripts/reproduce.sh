@@ -22,7 +22,8 @@ bash scripts/setup.sh
 login() {
   curl -sf -X POST "$DIRECTUS_URL/auth/login" \
     -H "Content-Type: application/json" \
-    -d "{\"email\":\"$ADMIN_EMAIL\",\"password\":\"$ADMIN_PASSWORD\"}" | jq -r .data.access_token
+    -d "{\"email\":\"$ADMIN_EMAIL\",\"password\":\"$ADMIN_PASSWORD\"}" \
+    | sed -n 's/.*"access_token":"\([^"]*\)".*/\1/p' | head -n1
 }
 
 attach_policy() {
